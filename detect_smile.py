@@ -5,6 +5,7 @@ import numpy as np
 import argparse
 import imutils
 import cv2
+import os
 
 # construct agrument parser and parse the argument
 ap = argparse.ArgumentParser()
@@ -30,15 +31,16 @@ else:
 smile_count = 0
 not_smile_count = 0
 total_frame=0
+count = 0
 
 # Create a VideoCapture object and read from input file
 # If the input is the camera, pass 0 instead of the video file name
-cap = cv2.VideoCapture('./input/bao.mp4')
+cap = cv2.VideoCapture('./input/huy.mp4')
 
 # Check if camera opened successfully
 if (cap.isOpened()== False): 
   print("Error opening video stream or file")
-
+  
 # Read until video is completed
 while(cap.isOpened()):
   # Capture frame-by-frame
@@ -76,33 +78,51 @@ while(cap.isOpened()):
         # then set the label accordingly
         (notSmiling, smiling) = model.predict(roi)[0]
         label = "Smiling" if smiling > notSmiling else "Not Smiling"
-        count = 0
-        print("count:",count)
-        notSmileCount = 0
+
         if label == "Smiling":
             smile_count += 1
-            cv2.imwrite("./output/images/frame%d.jpg" % count, frame)     # save frame as JPEG file      
+            cv2.putText(frame, label, (fX, fY - 10),
+            cv2.FONT_HERSHEY_SIMPLEX, 0.45, (0, 0, 255), 2)
+            cv2.rectangle(frame, (fX, fY), (fX + fW, fY + fH),
+            (0, 0, 255), 2)
+            cv2.putText(frame, label, (fX, fY - 10),
+            cv2.FONT_HERSHEY_SIMPLEX, 0.45, (0, 0, 255), 2)
+            cv2.rectangle(frame, (fX, fY), (fX + fW, fY + fH),
+            (0, 0, 255), 2)
+            cv2.putText(frame, 'smile:  '+str(smile_count), (0, 30),
+            cv2.FONT_HERSHEY_SIMPLEX, 0.45, (0, 255, 21), 2)
+            cv2.imwrite("./output/positive/frame%d.jpg" % count, frame)
             ret, frame = cap.read()
             print('Read a new frame: ', ret)
-            count += 1
-        else: 
-            not_smile_count+=1
-            cv2.imwrite("./output/notsmiles/frame%d.jpg" % count, frame)     # save frame as JPEG file      
-            ret, frame = cap.read()
-            notSmileCount += 1
-        # display the label and bounding box rectangle on the output frame
-        cv2.putText(frameClone, label, (fX, fY - 10),
+            count += 1 # save frame as JPEG file 
+        else:
+            not_smile_count += 1
+            cv2.putText(frame, label, (fX, fY - 10),
             cv2.FONT_HERSHEY_SIMPLEX, 0.45, (0, 0, 255), 2)
-        cv2.rectangle(frameClone, (fX, fY), (fX + fW, fY + fH),
+            cv2.rectangle(frame, (fX, fY), (fX + fW, fY + fH),
             (0, 0, 255), 2)
-        cv2.putText(frameClone, 'smile:  '+str(smile_count), (0, 30),
-        cv2.FONT_HERSHEY_SIMPLEX, 0.45, (0, 255, 21), 2)
-        cv2.putText(frameClone, 'not smile:  '+str(not_smile_count), (0, 60),
-        cv2.FONT_HERSHEY_SIMPLEX, 0.45, (0, 0, 255), 2)
-        cv2.putText(frameClone, 'total frame:  '+str(total_frame), (0, 90),
-        cv2.FONT_HERSHEY_SIMPLEX, 0.45, (255, 0, 234), 2)
-        cv2.putText(frameClone, 'detected frame:  '+str(smile_count+not_smile_count), (0, 120),
-        cv2.FONT_HERSHEY_SIMPLEX, 0.45, (255, 98, 0), 2)
+            cv2.putText(frame, label, (fX, fY - 10),
+            cv2.FONT_HERSHEY_SIMPLEX, 0.45, (0, 0, 255), 2)
+            cv2.rectangle(frame, (fX, fY), (fX + fW, fY + fH),
+            (0, 0, 255), 2)
+            cv2.putText(frame, 'not smile:  '+str(not_smile_count), (0, 60),
+            cv2.FONT_HERSHEY_SIMPLEX, 0.45, (0, 0, 255), 2)
+            cv2.imwrite("./output/negative/frame%d.jpg" % count, frame)     # save frame as JPEG file      
+            ret, frame = cap.read()
+            count += 1
+        # display the label and bounding box rectangle on the output frame
+        # cv2.putText(frameClone, label, (fX, fY - 10),
+        #     cv2.FONT_HERSHEY_SIMPLEX, 0.45, (0, 0, 255), 2)
+        # cv2.rectangle(frameClone, (fX, fY), (fX + fW, fY + fH),
+        #     (0, 0, 255), 2)
+        # cv2.putText(frameClone, 'smile:  '+str(smile_count), (0, 30),
+        # cv2.FONT_HERSHEY_SIMPLEX, 0.45, (0, 255, 21), 2)
+        # cv2.putText(frameClone, 'not smile:  '+str(not_smile_count), (0, 60),
+        # cv2.FONT_HERSHEY_SIMPLEX, 0.45, (0, 0, 255), 2)
+        # cv2.putText(frameClone, 'total frame:  '+str(total_frame), (0, 90),
+        # cv2.FONT_HERSHEY_SIMPLEX, 0.45, (255, 0, 234), 2)
+        # cv2.putText(frameClone, 'detected frame:  '+str(smile_count+not_smile_count), (0, 120),
+        # cv2.FONT_HERSHEY_SIMPLEX, 0.45, (255, 98, 0), 2)
 
     # show our detected faces along with smiling/not smiling labels
     cv2.imshow("Face", frameClone)
