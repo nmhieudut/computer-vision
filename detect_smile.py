@@ -43,6 +43,7 @@ if (cap.isOpened()== False):
 while(cap.isOpened()):
   # Capture frame-by-frame
   ret, frame = cap.read()
+
   if ret == True:
     total_frame+=1
     # if we are viewing a video and we did not grab a frame,
@@ -75,11 +76,20 @@ while(cap.isOpened()):
         # then set the label accordingly
         (notSmiling, smiling) = model.predict(roi)[0]
         label = "Smiling" if smiling > notSmiling else "Not Smiling"
+        count = 0
+        print("count:",count)
+        notSmileCount = 0
         if label == "Smiling":
-            smile_count+=1
+            smile_count += 1
+            cv2.imwrite("./output/images/frame%d.jpg" % count, frame)     # save frame as JPEG file      
+            ret, frame = cap.read()
+            print('Read a new frame: ', ret)
+            count += 1
         else: 
             not_smile_count+=1
-
+            cv2.imwrite("./output/notsmiles/frame%d.jpg" % count, frame)     # save frame as JPEG file      
+            ret, frame = cap.read()
+            notSmileCount += 1
         # display the label and bounding box rectangle on the output frame
         cv2.putText(frameClone, label, (fX, fY - 10),
             cv2.FONT_HERSHEY_SIMPLEX, 0.45, (0, 0, 255), 2)
@@ -96,7 +106,7 @@ while(cap.isOpened()):
 
     # show our detected faces along with smiling/not smiling labels
     cv2.imshow("Face", frameClone)
-
+  
     # Press Q on keyboard to  exit
     if cv2.waitKey(25) & 0xFF == ord('q'):
       break
