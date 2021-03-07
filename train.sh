@@ -1,0 +1,1 @@
+py train_model.py -d H:\ComputerVision\Smile_Detection\dataset\SMILEsmileD\SMILEs -m  H:\ComputerVision\Smile_Detection\pipeline\nn\conv\lenet.py -p H:\ComputerVision\Smile_Detection\output\training_loss_and_accuracy_plot.png
